@@ -1,0 +1,9 @@
+{
+  "bananodeApiUrl": "https://kaliumapi.appditto.com/api",
+  "walletSeed": "",
+  "token": "",
+  "discordIdSeed": "",
+  "botPrefix": "!",
+  "botEmoji": "🍌",
+  "maxPendingBananos": 10
+}

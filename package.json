@@ -1,0 +1,26 @@
+{
+  "name": "banano-discord-bot",
+  "version": "1.0.0",
+  "description": "banano-discord-bot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BananoCoin/dumblebee.git"
+  },
+  "scripts": {
+    "eslint": "eslint --fix 'scripts/**/*.js'",
+    "start": "node -max-old-space-size=1700 scripts/index.js",
+    "screenstart": "screen -dmSL dumblebee npm start;screen -x dumblebee",
+    "config": "node scripts/config.js"
+  },
+  "author": "Coranos",
+  "license": "MIT",
+  "dependencies": {
+    "@bananocoin/bananojs": "^2.1.1",
+    "discord.js": "^12.4.1"
+  },
+  "preferGlobal": true,
+  "devDependencies": {
+    "eslint": "^7.12.1",
+    "eslint-config-google": "^0.14.0"
+  }
+}
