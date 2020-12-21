@@ -1,4 +1,4 @@
-# banano-discord-bot
+# dumblebee discord tiobot
 
 ## to init config file
 ### (will not override an existing config file)
