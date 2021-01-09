@@ -1,4 +1,4 @@
-# dumblebee discord tiobot
+# dumblebee discord tipbot
 
 ## to init config file
 ### (will not override an existing config file)
