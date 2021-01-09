@@ -3,7 +3,7 @@
 const Discord = require( 'discord.js' );
 const crypto = require('crypto');
 const bananojs = require('@bananocoin/bananojs');
-
+var qr = require('qr-image');
 // modules
 
 // constants
@@ -160,6 +160,11 @@ const init = async () => {
       if (message.content === `${config.botPrefix}account`) {
         message.react(config.botEmoji);
         message.channel.send(account);
+        var qr_svg = qr.image(account, { type: 'png' });
+        qr_svg.pipe(require('fs').createWriteStream('account.png'));
+        const attachment = new Discord.MessageAttachment('./account.png');
+        message.channel.send(attachment);
+
       }
       if (message.content === `${config.botPrefix}accountinfo`) {
         message.react(config.botEmoji);
