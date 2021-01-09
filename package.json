@@ -15,13 +15,13 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.1.1",
-    "discord.js": "^12.4.1",
+    "@bananocoin/bananojs": "^2.2.2",
+    "discord.js": "^12.5.1",
     "qr-image": "^3.2.0"
   },
   "preferGlobal": true,
   "devDependencies": {
-    "eslint": "^7.12.1",
+    "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0"
   }
 }

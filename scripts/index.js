@@ -3,52 +3,14 @@
 const Discord = require( 'discord.js' );
 const crypto = require('crypto');
 const bananojs = require('@bananocoin/bananojs');
-var qr = require('qr-image');
+const qr = require('qr-image');
 // modules
 
 // constants
-const entropyList = [];
-let entropySeed = crypto.randomBytes(32);
-
 const SEED_IX = 0;
 const config = require('./config.json');
 const configOverride = require('../config.json');
 const discordClient = new Discord.Client();
-
-const getRandom = (min, max) => {
-  if (max == min) {
-    return min;
-  }
-  const range = max - min;
-  fillEntropy();
-  let entropy = entropyList.shift();
-  let maxEntropy = 256;
-  while (maxEntropy < range) {
-    fillEntropy();
-    maxEntropy *= 256;
-    entropy *= 256;
-    entropy += entropyList.shift();
-  }
-  const scaledEntropy = (entropy / maxEntropy) * range;
-  const retval = min + scaledEntropy;
-  return retval;
-};
-
-const getRandomInt = (min, max) => {
-  return Math.floor(getRandom(Math.floor(min), Math.floor(max)));
-};
-
-const fillEntropy = () => {
-  if (entropyList.length < 32) {
-    const seedHash = crypto.createHash('sha256')
-        .update(entropySeed)
-        .digest();
-    for (let x = 0; x < seedHash.length; x++) {
-      entropyList.push(seedHash[x]);
-    }
-    entropySeed = seedHash;
-  }
-};
 
 const getSeedFromDiscordId = (authorId) => {
   const seedHash = crypto.createHash('sha256')
@@ -58,7 +20,7 @@ const getSeedFromDiscordId = (authorId) => {
   return seedHash.toString('hex');
 };
 
-function getUserFromMention(mention) {
+const getUserFromMention = (mention) => {
   if (!mention) return;
 
   if (mention.startsWith('<@') && mention.endsWith('>')) {
@@ -70,7 +32,7 @@ function getUserFromMention(mention) {
 
     return discordClient.users.cache.get(mention);
   }
-}
+};
 
 const isObject = function(obj) {
   return (!!obj) && (obj.constructor === Object);
@@ -112,7 +74,7 @@ const receivePending = async (representative, seed, channel) => {
       console.log('response', response);
       const embed = new Discord.MessageEmbed()
           .setColor('#DBA250')
-          .setFooter(config.botname,config.footerURL)
+          .setFooter(config.botname, config.footerURL)
           .setTitle('receive');
       embed.addFields( {name: 'account', value: account});
       if (response.pendingMessage) {
@@ -131,7 +93,6 @@ const receivePending = async (representative, seed, channel) => {
 const init = async () => {
   process.on('SIGINT', closeProgram);
   overrideConfig();
-  fillEntropy();
   bananojs.setBananodeApiUrl(config.bananodeApiUrl);
 
   const walletAccount = bananojs.getBananoAccountFromSeed(config.walletSeed, SEED_IX);
@@ -139,14 +100,14 @@ const init = async () => {
   discordClient.on('message', async (message) => {
     const authorId = message.author.id;
     const seed = getSeedFromDiscordId(authorId);
-    const account = bananojs.getBananoAccountFromSeed(seed, SEED_IX);
+    const account = await bananojs.getBananoAccountFromSeed(seed, SEED_IX);
 
     if (message.content.startsWith(config.botPrefix) && (!message.author.bot)) {
       if (message.content === `${config.botPrefix}help`) {
         message.react(config.botEmoji);
         const embed = new Discord.MessageEmbed()
             .setColor('#DBA250')
-            .setFooter(config.botname,config.footerURL)
+            .setFooter(config.botname, config.footerURL)
             .setTitle('help commands');
         embed.addFields(
             {name: `${config.botPrefix}help`, value: 'show help'},
@@ -162,16 +123,17 @@ const init = async () => {
       if (message.content === `${config.botPrefix}account`) {
         message.react(config.botEmoji);
         message.channel.send(account);
-        var qr_svg = qr.image(account, { type: 'pngt' });
-        qr_svg.pipe(require('fs').createWriteStream('account.png'));
-        const attachment = new Discord.MessageAttachment('./account.png');
+        console.log(account);
+        const qrSvg = qr.image(account, {type: 'png'});
+        // console.log(qrSvg)
+        // qrSvg.pipe(require('fs').createWriteStream('account.png'));
+        const attachment = new Discord.MessageAttachment(qrSvg, 'account.png');
         message.channel.send(attachment);
-
       }
       if (message.content === `${config.botPrefix}accountinfo`) {
         message.react(config.botEmoji);
         const embed = new Discord.MessageEmbed()
-            .setFooter(config.botname,config.footerURL)
+            .setFooter(config.botname, config.footerURL)
             .setColor('#DBA250')
             .setTitle('account info');
         embed.addFields( {name: 'account', value: account});
@@ -215,7 +177,7 @@ const init = async () => {
       if (message.content === `${config.botPrefix}recieve`) {
         message.react('❌');
         const embed = new Discord.MessageEmbed()
-            .setFooter(config.botname,config.footerURL)
+            .setFooter(config.botname, config.footerURL)
             .setColor('#DBA250')
             .setTitle('help command for receive');
         embed.addFields(
@@ -233,7 +195,7 @@ const init = async () => {
         if (words.length < 3) {
           message.react('❌');
           const embed = new Discord.MessageEmbed()
-              .setFooter(config.botname,config.footerURL)
+              .setFooter(config.botname, config.footerURL)
               .setColor('#DBA250')
               .setTitle('help command for send');
           embed.addFields(
@@ -248,7 +210,7 @@ const init = async () => {
         const rawStr = bananojs.getBananoDecimalAmountAsRaw(amount);
         const rawStrDesc = getBananoAmountDesc(rawStr);
         const embed = new Discord.MessageEmbed()
-            .setFooter(config.botname,config.footerURL)
+            .setFooter(config.botname, config.footerURL)
             .setColor('#DBA250')
             .setTitle('send');
         embed.addFields(
@@ -284,7 +246,7 @@ const init = async () => {
         if (words.length < 3) {
           message.react('❌');
           const embed = new Discord.MessageEmbed()
-              .setFooter(config.bot,config.footerURL)
+              .setFooter(config.bot, config.footerURL)
               .setColor('#DBA250')
               .setTitle('help command for tip');
           embed.addFields(
@@ -302,7 +264,7 @@ const init = async () => {
         const rawStr = bananojs.getBananoDecimalAmountAsRaw(amount);
         const rawStrDesc = getBananoAmountDesc(rawStr);
         const embed = new Discord.MessageEmbed()
-            .setFooter(config.botname,config.footerURL)
+            .setFooter(config.botname, config.footerURL)
             .setColor('#DBA250')
             .setTitle('send')
             .setAuthor(`${toUser.username}#${toUser.discriminator}`, toUser.displayAvatarURL());
