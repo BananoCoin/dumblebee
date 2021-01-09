@@ -5,5 +5,8 @@
   "discordIdSeed": "",
   "botPrefix": "!",
   "botEmoji": "🍌",
-  "maxPendingBananos": 10
+  "maxPendingBananos": 10,
+  "botname":"BananoBot",
+  "footerURL":""
+
 }
