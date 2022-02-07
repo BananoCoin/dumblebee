@@ -155,7 +155,9 @@ const init = async () => {
     let fetched;
     do {
       fetched = await channel.messages.fetch({limit: 100});
-      channel.bulkDelete(fetched);
+      if (fetched.size > 0) {
+        channel.bulkDelete(fetched);
+      }
     }
     while (fetched.size > 0);
 
