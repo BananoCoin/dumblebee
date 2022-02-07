@@ -6,7 +6,8 @@
   "botPrefix": "!",
   "botEmoji": "🍌",
   "maxPendingBananos": 10,
-  "botname":"BananoBot",
-  "footerURL":""
-
+  "botname": "BananoBot",
+  "footerURL": "",
+  "reactionChannelId": "",
+  "hiddenChannelRole": ""
 }

@@ -1,6 +1,6 @@
 'use strict';
 // libraries
-const Discord = require( 'discord.js' );
+const {Client, Intents} = require('discord.js');
 const crypto = require('crypto');
 const bananojs = require('@bananocoin/bananojs');
 const qr = require('qr-image');
@@ -10,7 +10,11 @@ const qr = require('qr-image');
 const SEED_IX = 0;
 const config = require('./config.json');
 const configOverride = require('../config.json');
-const discordClient = new Discord.Client();
+const discordClient = new Client({intents: [
+  Intents.FLAGS.GUILDS,
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+]});
 
 const getSeedFromDiscordId = (authorId) => {
   const seedHash = crypto.createHash('sha256')
@@ -97,7 +101,75 @@ const init = async () => {
 
   const walletAccount = bananojs.getBananoAccountFromSeed(config.walletSeed, SEED_IX);
 
-  discordClient.on('message', async (message) => {
+  discordClient.on('messageReactionAdd', async (reaction, user) => {
+  	// When a reaction is received, check if the structure is partial
+  	if (reaction.partial) {
+  		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+  		try {
+  			await reaction.fetch();
+  		} catch (error) {
+  			console.error('Something went wrong when fetching the message:', error);
+  			// Return as `reaction.message.author` may be undefined/null
+  			return;
+  		}
+  	}
+
+  	// Now the message has been cached and is fully available
+  	console.log(`${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`);
+  	// The reaction is now also fully available and the properties will be reflected accurately:
+  	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
+
+    const guild = discordClient.guilds.cache.get(reaction.message.guild.id);
+    const member = await guild.members.fetch(user.id);
+    const role = reaction.message.guild.roles.cache.find((role) => role.name === config.hiddenChannelRole);
+    member.roles.add(role);
+  });
+
+  discordClient.on('messageReactionRemove', async (reaction, user) => {
+  	// When a reaction is received, check if the structure is partial
+  	if (reaction.partial) {
+  		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+  		try {
+  			await reaction.fetch();
+  		} catch (error) {
+  			console.error('Something went wrong when fetching the message:', error);
+  			// Return as `reaction.message.author` may be undefined/null
+  			return;
+  		}
+  	}
+
+  	// Now the message has been cached and is fully available
+  	console.log(`${reaction.message.author}'s message "${reaction.message.content}" lost a reaction!`);
+  	// The reaction is now also fully available and the properties will be reflected accurately:
+  	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
+
+    const guild = discordClient.guilds.cache.get(reaction.message.guild.id);
+    const member = await guild.members.fetch(user.id);
+    const role = reaction.message.guild.roles.cache.find((role) => role.name === config.hiddenChannelRole);
+    member.roles.remove(role);
+  });
+
+  discordClient.on('ready', async () => {
+    const channel = await discordClient.channels.fetch(config.reactionChannelId);
+
+    let fetched;
+    do {
+      fetched = await channel.messages.fetch({limit: 100});
+      channel.bulkDelete(fetched);
+    }
+    while (fetched.size > 0);
+
+    channel.send('react to this message to access the hidden channels.');
+    console.log('ready', 'reactionChannelId', config.reactionChannelId);
+  });
+
+  discordClient.on('messageCreate', async (message) => {
+    console.log('messageCreate', 'message.channel.id', message.channel.id);
+    if (message.channel.id === config.reactionChannelId) {
+      message.react(config.botEmoji);
+      return;
+    }
+
     const authorId = message.author.id;
     const seed = getSeedFromDiscordId(authorId);
     const account = await bananojs.getBananoAccountFromSeed(seed, SEED_IX);

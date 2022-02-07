@@ -1,6 +1,6 @@
 {
   "name": "banano-discord-bot",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "banano-discord-bot",
   "repository": {
     "type": "git",
@@ -8,6 +8,8 @@
   },
   "scripts": {
     "eslint": "eslint --fix 'scripts/**/*.js'",
+    "npm-check-updates": "npm-check-updates --target patch -u",
+    "preflight": "npm update;npm run npm-check-updates;npm i;npm audit fix;npm outdated;npm run eslint;",
     "start": "node -max-old-space-size=1700 scripts/index.js",
     "screenstart": "screen -dmSL dumblebee npm start;screen -x dumblebee",
     "config": "node scripts/config.js"
@@ -15,13 +17,14 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.4.13",
-    "discord.js": "^12.5.3",
+    "@bananocoin/bananojs": "^2.4.26",
+    "discord.js": "^13.6.0",
     "qr-image": "^3.2.0"
   },
   "preferGlobal": true,
   "devDependencies": {
     "eslint": "^7.30.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "npm-check-updates": "^12.2.1"
   }
 }

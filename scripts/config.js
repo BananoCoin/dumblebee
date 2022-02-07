@@ -17,6 +17,8 @@ const writeConfig = () => {
     config.walletSeed = crypto.randomBytes(32).toString('hex').toUpperCase();
     config.token = 'get discord bot token from https://discord.com/developers/applications';
     config.discordIdSeed = crypto.randomBytes(32).toString('hex').toUpperCase();
+    config.reactionChannelId = '?';
+    config.hiddenChannelRole = 'bot approved';
     const configFilePtr = fs.openSync(configFileNm, 'w');
     fs.writeSync(configFilePtr, JSON.stringify(config, undefined, 2));
     fs.closeSync(configFilePtr);
