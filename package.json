@@ -18,13 +18,13 @@
   "license": "MIT",
   "dependencies": {
     "@bananocoin/bananojs": "^2.4.26",
-    "discord.js": "^13.6.0",
+    "discord.js": "^14.7.1",
     "qr-image": "^3.2.0"
   },
   "preferGlobal": true,
   "devDependencies": {
-    "eslint": "^7.30.0",
+    "eslint": "^8.34.0",
     "eslint-config-google": "^0.14.0",
-    "npm-check-updates": "^12.2.1"
+    "npm-check-updates": "^16.7.4"
   }
 }
